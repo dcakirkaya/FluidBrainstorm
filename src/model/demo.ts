@@ -86,6 +86,16 @@ export class AutoNote {
         return text;
     }
 
+    private static getRandom = (input: string[]) => input[Math.floor(Math.random() * input.length)];
+
+    public static createDemoItem(): {url: string, label: string} {
+        return { 
+             url: this.getRandom(this.demoText),
+             label: this.getRandom(this.demoUrl)
+        };       
+    }
+
+    
     /**
      * Purely for demo purposes.
      */
@@ -110,5 +120,13 @@ export class AutoNote {
         "Fewer motivational posters.",
         "A gym where we can workout with the personal trainers",
         "Table tennis. Competitive table tennis."
+    ]
+
+    private static demoUrl: string[] = [
+        "mfs.com",
+        "whenitrains.url",
+        "butdoesitrun.com",
+        "anythingoes.org",
+        "gloom.corp",        
     ]
 }

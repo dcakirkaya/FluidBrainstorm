@@ -14,7 +14,7 @@ export type MfsItem = {
 };
 
 export type MfsProperty = {
-    appId: string;
+    appId?: string;
     propertyName: string;
 }
 
@@ -23,14 +23,14 @@ export type MfsQuery = {
     /**
      * The properties to include in the result MfsItems. If using properties shared from other apps, then need to specify MfsProperty.
      */
-    select?: MfsProperty | MfsProperty[] | string[] | string;
+    select?: MfsProperty[];
 }
 
 export interface MfsDataModel<T extends MfsItem> {    
     putItem(item: T) : void;
     getItem(itemId: string, query?: MfsQuery) : T | undefined;
     deleteItem(itemId: string): void;    
-    getItems(query?: MfsQuery): IterableIterator<T>; 
+    getItems(query?: MfsQuery): IterableIterator<T | unknown>; 
     on(event: "change", listener: () => void): this;
     off(event: "change", listener: () => void): this;    
 }

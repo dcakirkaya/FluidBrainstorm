@@ -160,9 +160,23 @@ export class MfsApp extends DataObject implements MfsAppDataModel {
         this.itemExtensions.delete(itemId);        
     }
     
-    public getItems(query?: MfsQuery): IterableIterator<MfsAppItem> {        
-        // TODO: query!
-        return this.items.values();
+    public *getItems(query?: MfsQuery): IterableIterator<MfsAppItem | unknown> {        
+        if (query && (query.filter || query.select)) {            
+            this.items.forEach((v, k) => this.filterAndSelect(v, k, query));
+        } else {
+            yield* this.items.values();
+        }        
+    }
+
+    private *filterAndSelect(value: any, key: any, query: MfsQuery): IterableIterator<unknown>{
+        if (!query.filter || query.filter(value)) { 
+            // TODO: implement select correctly  -- go to the right container and choose the selected props.
+            if (query.select.some(p => !!p)) {
+                yield {value,...this.itemExtensions.get<MfsItemExtension>(key)};
+            } else {
+                yield value;    
+            }
+        }
     }
     
     public like (itemId: string): void {
