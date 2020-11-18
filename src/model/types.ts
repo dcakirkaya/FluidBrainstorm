@@ -1,9 +1,16 @@
 /** COMMON MFS MODEL  */
+export type MfsItemData = {    
+    id: string;
+    url: string;
+    label?: string;
+    isParked?: boolean; 
+};
+
 export type MfsItem = {    
     id: string;
     url: string;
-    label: string;
-    isParked: boolean; 
+    label?: string;
+    isParked?: boolean; 
 };
 
 export type MfsProperty = {
@@ -19,13 +26,11 @@ export type MfsQuery = {
     select?: MfsProperty | MfsProperty[] | string[] | string;
 }
 
-export interface MfsDataModel<T extends MfsItem>  {    
+export interface MfsDataModel<T extends MfsItem> {    
     putItem(item: T) : void;
     getItem(itemId: string, query?: MfsQuery) : T | undefined;
     deleteItem(itemId: string): void;    
-    getItems(query?: MfsQuery): IterableIterator<T>;
-    setItemProperty: (item: T) => void;
-    getItemProperty: (item: T) => unknown;    
+    getItems(query?: MfsQuery): IterableIterator<T>; 
     on(event: "change", listener: () => void): this;
     off(event: "change", listener: () => void): this;    
 }
@@ -51,6 +56,7 @@ export type MfsAppItem = MfsItem & MfsItemExtension;
 export interface MfsAppDataModel  extends MfsDataModel<MfsAppItem> {
     getUser(): User | undefined;
     getUsers(): User[];    
-    like: (item: MfsAppItem) => void;
+    like: (itemId: string) => void;
+    createAppItem (url: string, label: string): void;
 }
  

@@ -7,25 +7,24 @@ import {
     DataObject,
     DataObjectFactory,
 } from "@fluidframework/aqueduct";
-import { MfsAppDataModel, MfsAppItem, MfsItem, MfsQuery, User } from "./types";
+import { MfsAppDataModel, MfsAppItem, MfsItem, MfsItemExtension, MfsQuery, User } from "./types";
 
 import { FakeUser } from "./demo";
 import { IFluidHandle } from "@fluidframework/core-interfaces";
 import { SharedMap } from "@fluidframework/map";
+import uuid from "uuid";
 
 const MfsAppConfig = {
-    ItemsDir: "items",
-    AppItemsDir: "appItems",
-    UsersDir: "users"
+    ItemsMap: "items",
+    ItemExtensionsMap: "itemExtensions",
+    UsersMap: "users"
 };
 
-export class MfsApp extends DataObject implements MfsAppDataModel {
-    setItemProperty: (item: MfsAppItem) => void;
-    getItemProperty: (item: MfsAppItem) => unknown;
-    
+export class MfsApp extends DataObject implements MfsAppDataModel {   
+   
     // Local references to the SharedMaps used in this component
     private items: SharedMap;    
-    private appItems: SharedMap;
+    private itemExtensions: SharedMap;
     private users: SharedMap;
     
     // stores a fake userId as we aren't using true auth for this demo
@@ -42,9 +41,9 @@ export class MfsApp extends DataObject implements MfsAppDataModel {
      */
     protected async initializingFirstTime() {
         // Create SharedMaps for the notes, votes, and users
-        this.createSharedMap(MfsAppConfig.ItemsDir);        
-        this.createSharedMap(MfsAppConfig.AppItemsDir);
-        this.createSharedMap(MfsAppConfig.UsersDir);
+        this.createSharedMap(MfsAppConfig.ItemsMap);        
+        this.createSharedMap(MfsAppConfig.ItemExtensionsMap);
+        this.createSharedMap(MfsAppConfig.UsersMap);
     }
 
     /**
@@ -62,16 +61,16 @@ export class MfsApp extends DataObject implements MfsAppDataModel {
     protected async hasInitialized() {
         // Create local references to the SharedMaps.
         // Otherwise, they need to be called async which is inconvenient.
-        this.items = await this.root.get<IFluidHandle<SharedMap>>(MfsAppConfig.ItemsDir).get();
-        this.appItems = await this.root.get<IFluidHandle<SharedMap>>(MfsAppConfig.AppItemsDir).get();
-        this.users = await this.root.get<IFluidHandle<SharedMap>>(MfsAppConfig.UsersDir).get();
+        this.items = await this.root.get<IFluidHandle<SharedMap>>(MfsAppConfig.ItemsMap).get();
+        this.itemExtensions = await this.root.get<IFluidHandle<SharedMap>>(MfsAppConfig.ItemExtensionsMap).get();
+        this.users = await this.root.get<IFluidHandle<SharedMap>>(MfsAppConfig.UsersMap).get();
 
         // Add the current user to set of collaborators.
         this.addUser();
 
         // Set up event listeners to update the ui when data changes               
         this.createEventListeners(this.items);
-        this.createEventListeners(this.appItems);
+        this.createEventListeners(this.itemExtensions);
         this.createEventListeners(this.users);
 
         // quorum
@@ -102,42 +101,6 @@ export class MfsApp extends DataObject implements MfsAppDataModel {
             this.emit("change");
         });
 
-    }
-
-    putItem(item: MfsItem): MfsItem {        
-        const appItem: MfsAppItem = {
-            ...item,
-            user: this.getUser(),
-            likes: 0
-        };        
-        this.items.set(appItem.id, appItem);
-        return appItem;
-    }
-    
-    getItem(itemId: string, query?: MfsQuery) {
-        if (!query) {
-            const baseItem: MfsItem = this.items.get(itemId);
-            const appItem: MfsAppItem = this.appItems.get(itemId);
-            if (appItem)  {
-                const r: MfsAppItem = {...baseItem, ...appItem};
-                return r;
-            }
-        }
-    }
-    
-    deleteItem(itemId: string): void {
-        
-    }
-    
-    getItems<MfsAppItem>(query?: MfsQuery): IterableIterator<MfsAppItem> {
-        throw new Error("Method not implemented.");
-    }
-    
-    public like = (item: MfsAppItem): void => {
-        if (this.appItems.has(item.id)) {
-            var numLikes = this.appItems.get(item.id).get("likes");
-            this.appItems.get(item.id).set("likes", numLikes++);
-        }
     }
 
     /**
@@ -177,6 +140,46 @@ export class MfsApp extends DataObject implements MfsAppDataModel {
             users.push(i);
         });
         return users;
+    }
+    
+    public putItem(item: MfsAppItem): void {
+        const {  id, url, label, isParked, ...extension } = item;
+        this.items.set(item.id, {id, url, label, isParked});
+        this.itemExtensions.set(item.id, extension);
+    }
+    
+    public getItem(itemId: string, query?: MfsQuery): MfsAppItem {
+        // TODO: query !
+        return {
+            ...this.items.get<MfsItem>(itemId), 
+            ...this.itemExtensions.get<MfsItemExtension>(itemId)};
+    }
+    
+    public deleteItem(itemId: string): void {        
+        this.items.delete(itemId);
+        this.itemExtensions.delete(itemId);        
+    }
+    
+    public getItems(query?: MfsQuery): IterableIterator<MfsAppItem> {        
+        // TODO: query!
+        return this.items.values();
+    }
+    
+    public like (itemId: string): void {
+        if(this.items.has(itemId)) {
+            const { user, likes} : MfsItemExtension = this.itemExtensions.get(itemId);
+            this.itemExtensions.set(itemId, {...user, likes:likes+1});
+        }
+    }
+    
+    public createAppItem(url: string, label?: string): void {
+        this.putItem({
+            id: uuid(),
+            url: url,
+            label: label ?? url,
+            user: this.getUser(),
+            likes: 0            
+        });        
     }
 }
 
