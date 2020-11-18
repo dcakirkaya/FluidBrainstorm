@@ -3,7 +3,7 @@
  * Licensed under the MIT License.
  */
 
-import { MfsApp } from "./fluid-object";
+import { MfsApp } from "./model";
 import { MfsAppContainerFactory } from "./container";
 import { MfsAppView } from "./MfsAppView";
 import React from "react";

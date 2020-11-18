@@ -5,11 +5,11 @@
 
 import React, { FC, KeyboardEvent } from "react";
 
-interface NoteEditorProps extends React.AllHTMLAttributes<HTMLTextAreaElement> {
+interface ItemEditorProps extends React.AllHTMLAttributes<HTMLTextAreaElement> {
   onEnter: () => void;
 }
 
-export const NoteEditor: FC<NoteEditorProps> = (props) => {
+export const ItemEditor: FC<ItemEditorProps> = (props) => {
   const onKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.keyCode == 13 && !e.shiftKey) {
       e.preventDefault();

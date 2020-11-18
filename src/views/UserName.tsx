@@ -4,10 +4,11 @@
  */
 
 import React, { FC } from "react";
-import { IUser } from "../fluid-object/interfaces";
+
+import { User } from "../model/types";
 
 interface UserNameProps {
-  user: IUser;
+  user: User;
   userCount: number;
 }
 

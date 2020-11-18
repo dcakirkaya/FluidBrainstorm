@@ -3,18 +3,19 @@
  * Licensed under the MIT License.
  */
 
-import React, { FC, useState, ChangeEvent } from "react";
-import { IUser } from "../fluid-object/interfaces";
-import { NoteEditor } from "./NoteEditor";
+import { MfsItem, User } from "../model/types";
+import React, { ChangeEvent, FC, useState } from "react";
+
 import { Button } from "./Button";
+import { ItemEditor } from "./ItemEditor";
 import { UserName } from "./UserName";
 
 // Pad
 interface PadProps {
-  createNote: (text: string) => void;
+  createItem: (text: string) => MfsItem;
   demo: () => string;
-  user: IUser;
-  users: IUser[];
+  user: User;
+  users: User[];
   clear: () => void;
   setHighlightMine: (value: boolean) => void;
   highlightMine: boolean;
@@ -23,14 +24,11 @@ interface PadProps {
 export const Pad: FC<PadProps> = (props) => {
   const [value, setValue] = useState<string>("");
 
-  const createNote = () => {
-    props.createNote(value);
+  const createItem = () => {
+    props.createItem(value);
     setValue("");
   };
-  const handleHighlight = () => {
-    props.setHighlightMine(!props.highlightMine);
-  };
-
+  
   const onNoteValueChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
     setValue(e.target.value);
   };
@@ -44,16 +42,13 @@ export const Pad: FC<PadProps> = (props) => {
   return (
     <div className="container">
       <div className="pad">
-        <NoteEditor
+        <ItemEditor
           onFocus={onNoteFocus}
           value={value}
           onChange={onNoteValueChange}
-          onEnter={createNote}
+          onEnter={createItem}
         />
-        <Button onClick={createNote}> Share my idea </Button>
-        <Button onClick={handleHighlight}>
-          {props.highlightMine ? "Stop highlighting" : "Highlight my ideas"}
-        </Button>
+        <Button onClick={createItem}> Share my idea </Button>        
         {/* <Button onClick={props.clear}> Tidy up </Button> */}
         <UserName user={props.user} userCount={props.users.length} />
       </div>
