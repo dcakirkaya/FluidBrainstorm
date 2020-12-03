@@ -32,15 +32,3 @@ export interface IBallot {
     noteId: string,
     user: IUser
 }
-
-export interface IMfsAppDataModel {
-    getUsers: () => IUser[];
-    getUser: () => IUser;
-    addUser: () => void;
-    getNotesFromBoard: () => INoteWithVotes[];
-    createDemoNote: () => string;
-    createNote: (text: string) => void;
-    vote: (note: INote) => void;
-    on(event: "change", listener: () => void): this;
-    off(event: "change", listener: () => void): this;
-}

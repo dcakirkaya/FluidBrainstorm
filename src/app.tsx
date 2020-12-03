@@ -3,8 +3,8 @@
  * Licensed under the MIT License.
  */
 
-import { MfsApp } from "./fluid-object";
 import { MfsAppContainerFactory } from "./container";
+import { MfsAppDataObject } from "./fluid-object";
 import { MfsAppView } from "./MfsAppView";
 import React from "react";
 import ReactDOM from "react-dom";
@@ -29,7 +29,7 @@ async function start() {
     const container = await getTinyliciousContainer(documentId, MfsAppContainerFactory, createNew);
 
     // Get the Default Object from the Container
-    const defaultObject = await getDefaultObjectFromContainer<MfsApp>(container);
+    const defaultObject = await getDefaultObjectFromContainer<MfsAppDataObject>(container);
 
     // Render the content using ReactDOM
     ReactDOM.render(

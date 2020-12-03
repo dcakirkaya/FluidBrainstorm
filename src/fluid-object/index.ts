@@ -4,4 +4,5 @@
  */
 
 export * from "./interfaces";
-export * from "./main";
+export * from "./appModel";
+export * from "./mfsModel";

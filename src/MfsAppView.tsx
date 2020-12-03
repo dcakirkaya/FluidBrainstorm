@@ -5,14 +5,13 @@
 
 import "./styles.scss";
 
-import {
-  IMfsAppDataModel,
-  INoteWithVotes,
-  IUser,
-} from "./fluid-object/interfaces";
+import { MfsAppDataModel, MfsAppItem } from "./fluid-object";
 import React, { FC, useEffect, useState } from "react";
 
 import { Board } from "./partials/Board";
+import {
+  IUser,
+} from "./fluid-object/interfaces";
 import { Pad } from "./partials/Pad";
 
 // eslint-disable-next-line import/no-unassigned-import
@@ -20,13 +19,13 @@ import { Pad } from "./partials/Pad";
 
 // MfsAppView
 interface MfsAppViewProps {
-  readonly model: IMfsAppDataModel;
+  readonly model: MfsAppDataModel;
 }
 
 interface MfsAppViewState {
   user: IUser;
   users: IUser[];
-  notes: INoteWithVotes[];
+  notes: MfsAppItem[];
 }
 
 export const MfsAppView: FC<MfsAppViewProps> = (props) => {
@@ -34,7 +33,7 @@ export const MfsAppView: FC<MfsAppViewProps> = (props) => {
     return {
       user: props.model.getUser(),
       users: props.model.getUsers(),
-      notes: props.model.getNotesFromBoard(),
+      notes: [...props.model.getItemsFromBoard()],
     };
   };
   const [state, setState] = useState<MfsAppViewState>(generateState());
@@ -58,8 +57,8 @@ export const MfsAppView: FC<MfsAppViewProps> = (props) => {
   return (
     <div>
       <Pad
-        createNote={props.model.createNote}
-        demo={props.model.createDemoNote}
+        createNote={props.model.createAppItem}
+        demo={props.model.createDemoItem}
         user={state.user}
         users={state.users}
         clear={() => alert("clear not implemented")}
@@ -68,7 +67,7 @@ export const MfsAppView: FC<MfsAppViewProps> = (props) => {
       />
       <Board
         notes={state.notes}
-        vote={props.model.vote}
+        like={props.model.like}
         user={state.user}
         highlightMine={highlightMine}
       />

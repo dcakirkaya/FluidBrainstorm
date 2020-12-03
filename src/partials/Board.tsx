@@ -4,12 +4,14 @@
  */
 
 import React, { FC } from "react";
-import { INote, INoteWithVotes, IUser } from "../fluid-object/interfaces";
+
+import { IUser } from "../fluid-object/interfaces";
+import { MfsAppItem } from "..";
 import { Note } from "./Note";
 
 interface BoardProps {
-  notes: INoteWithVotes[];
-  vote: (note: INote) => void;
+  notes: MfsAppItem[];
+  like: (itemId: string) => void;
   user: IUser;
   highlightMine: boolean;
 }
@@ -20,8 +22,8 @@ export const Board: FC<BoardProps> = (props) => (
       <Note
         key={note.id}
         note={note}
-        onClick={() => props.vote(note)}
-        count={note.votes}
+        onClick={() => props.like(note.id)}
+        count={note.numLikes}
         user={props.user}
         highlightMine={props.highlightMine}
       />

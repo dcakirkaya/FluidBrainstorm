@@ -3,16 +3,17 @@
  * Licensed under the MIT License.
  */
 
-import React, { FC, useState, ChangeEvent } from "react";
+import React, { ChangeEvent, FC, useState } from "react";
+
+import { Button } from "./Button";
 import { IUser } from "../fluid-object/interfaces";
 import { NoteEditor } from "./NoteEditor";
-import { Button } from "./Button";
 import { UserName } from "./UserName";
 
 // Pad
 interface PadProps {
-  createNote: (text: string) => void;
   demo: () => string;
+  createNote: (text: string) => void;
   user: IUser;
   users: IUser[];
   clear: () => void;
@@ -27,9 +28,9 @@ export const Pad: FC<PadProps> = (props) => {
     props.createNote(value);
     setValue("");
   };
-  const handleHighlight = () => {
-    props.setHighlightMine(!props.highlightMine);
-  };
+  // const handleHighlight = () => {
+  //   props.setHighlightMine(!props.highlightMine);
+  // };
 
   const onNoteValueChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
     setValue(e.target.value);
@@ -50,10 +51,10 @@ export const Pad: FC<PadProps> = (props) => {
           onChange={onNoteValueChange}
           onEnter={createNote}
         />
-        <Button onClick={createNote}> Share my idea </Button>
-        <Button onClick={handleHighlight}>
+        <Button onClick={createNote}> Create Mfs Item </Button>
+        {/* <Button onClick={handleHighlight}>
           {props.highlightMine ? "Stop highlighting" : "Highlight my ideas"}
-        </Button>
+        </Button> */}
         {/* <Button onClick={props.clear}> Tidy up </Button> */}
         <UserName user={props.user} userCount={props.users.length} />
       </div>

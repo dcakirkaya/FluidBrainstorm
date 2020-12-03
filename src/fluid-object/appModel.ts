@@ -1,9 +1,9 @@
 /** MFS APP SPECIFIC MODEL */
 
+import { AutoNote, FakeUser } from "./demo";
 import { DataObject, DataObjectFactory } from "@fluidframework/aqueduct";
 import { MfsDataModel, MfsItem, MfsQuery } from "./mfsModel";
 
-import { FakeUser } from "./demo";
 import { IFluidHandle } from "@fluidframework/core-interfaces";
 import { IUser } from ".";
 import { SharedMap } from "@fluidframework/map";
@@ -18,7 +18,7 @@ export type User = {
 
 export type MfsAppItem = MfsItem & {
     user: User;  
-    likes: number;  
+    numLikes: number;    
 };
 
 export interface MfsAppDataModel  extends MfsDataModel<MfsAppItem> {
@@ -26,11 +26,14 @@ export interface MfsAppDataModel  extends MfsDataModel<MfsAppItem> {
     getUser(): User | undefined;
     getUsers(): User[];    
     like: (itemId: string) => void;
-    createAppItem: (url: string, label: string) => void;
+    getItemsFromBoard: () => IterableIterator<MfsAppItem>;
+    createAppItem: (url: string, label?: string) => void;
+    createDemoItem: () => string;
 }
 
 
-export class MfsAppDataObject extends DataObject implements MfsAppDataModel {
+export class MfsAppDataObject extends DataObject implements MfsAppDataModel {    
+
     private itemsMap: SharedMap;
     private usersMap: SharedMap;
     
@@ -121,7 +124,7 @@ export class MfsAppDataObject extends DataObject implements MfsAppDataModel {
     
     public like = (itemId: string) :void => {
         let mfsItem = this.getItem(itemId);
-        mfsItem.likes = mfsItem.likes + 1;
+        mfsItem.numLikes = mfsItem.numLikes + 1;
     }
     
     public createAppItem = (url: string, label: string): void => {
@@ -130,7 +133,7 @@ export class MfsAppDataObject extends DataObject implements MfsAppDataModel {
             url,
             label,            
             user: this.getUser(),
-            likes: 0            
+            numLikes: 0            
         };
         this.createItem(appItem);
     }
@@ -153,6 +156,10 @@ export class MfsAppDataObject extends DataObject implements MfsAppDataModel {
             yield* this.itemsMap.values();
         }    
     }
+
+    public getItemsFromBoard =  (): IterableIterator<MfsAppItem> => {
+        return this.getItems() as IterableIterator<MfsAppItem>;
+    }
     
     private *filterAndSelect(value: any, query: MfsQuery): IterableIterator<unknown>{
         if (!query.filter || query.filter(value)) {             
@@ -162,6 +169,10 @@ export class MfsAppDataObject extends DataObject implements MfsAppDataModel {
                 yield value;    
             }
         }
+    }
+    
+    public createDemoItem = (): string => {
+        return AutoNote.createDemoNote()
     }    
 }
 

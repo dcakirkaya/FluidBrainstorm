@@ -4,7 +4,7 @@
  */
 
 import { ContainerRuntimeFactoryWithDefaultDataStore } from "@fluidframework/aqueduct";
-import { MfsAppInstantiationFactory } from "./fluid-object";
+import { MfsAppDataObjectInstantiationFactory } from "./fluid-object";
 
 /**
  * This does setup for the Container. The SimpleModuleInstantiationFactory also enables dynamic loading in the
@@ -18,6 +18,6 @@ import { MfsAppInstantiationFactory } from "./fluid-object";
  * components.
  */
 export const MfsAppContainerFactory = new ContainerRuntimeFactoryWithDefaultDataStore(
-  MfsAppInstantiationFactory.type,
-  new Map([MfsAppInstantiationFactory.registryEntry])
+  MfsAppDataObjectInstantiationFactory.type, 
+  new Map([MfsAppDataObjectInstantiationFactory.registryEntry])
 );
