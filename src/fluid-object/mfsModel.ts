@@ -5,26 +5,27 @@ export type MfsItem = {
     isParked?: boolean;     
 }
 
-// export type MfsRelationshipType = 'parent' | 'child' | 'onDate'; // TODO: use if there are some common relationship types for all apps?
-// export type ExtendedMfsRelationshipType<R> = R extends MfsRelationshipType ? MfsRelationshipType : R extends string ? R : never;
+//  if there are any common relationship types for all items - available to all apps, we can add them here.
+type MfsCommonRelationshipType = 'parent' | 'child' | 'onDate'; 
+export type MfsRelationshipType<R> = R extends MfsCommonRelationshipType ? MfsCommonRelationshipType : R extends string ? R : never;
 
-// export type MfsRelationship<TRelationship> = {    
-//     inId: string;
-//     outId: string;    
-//     type: ExtendedMfsRelationshipType<TRelationship>;    
-// }
+export type MfsRelationship<R> = {    
+    inId: string;
+    outId: string;    
+    type: MfsRelationshipType<R>;    
+}
 
-export type MfsQuery = {    
-    filter?: (item: MfsItem) => boolean | string; 
-    select?: string[];
-    expand?: string;
+export type MfsQuery<T extends MfsItem> = {    
+    filter?: (item: T) => boolean | string; 
+    select?: Array<keyof T>;
+    expand?: Array<keyof T>; 
 }
 
 export interface MfsDataModel<T extends MfsItem>{    
     createItem(item: T) : void;
-    getItem(itemId: string, query?: MfsQuery) : T | undefined;
+    getItem(itemId: string) : T | undefined;
     deleteItem(itemId: string): void;    
-    getItems(query?: MfsQuery): IterableIterator<T | unknown>; 
+    getItems(query?: MfsQuery<T>): IterableIterator<T | Partial<T>>; 
     on(event: "change", listener: () => void): this;
     off(event: "change", listener: () => void): this;   
 }

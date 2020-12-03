@@ -142,16 +142,16 @@ export class MfsAppDataObject extends DataObject implements MfsAppDataModel {
         this.itemsMap.set(item.id, item);
     }
     
-    public getItem(itemId: string, query?: MfsQuery): MfsAppItem {
+    public getItem(itemId: string): MfsAppItem {
         return this.itemsMap.get<MfsAppItem>(itemId);
     }
     public deleteItem(itemId: string): void {
         this.itemsMap.delete(itemId);
     }
     
-    public *getItems(query?: MfsQuery): IterableIterator<MfsAppItem | unknown> {
+    public *getItems(query?: MfsQuery<MfsAppItem>): IterableIterator<MfsAppItem | unknown> {
         if (query && (query.filter || query.select)) {            
-            this.itemsMap.forEach((v, k) => this.filterAndSelect(v, query));
+            this.itemsMap.forEach((v, _) => this.filterAndSelect(v, query));
         } else {
             yield* this.itemsMap.values();
         }    
@@ -161,9 +161,9 @@ export class MfsAppDataObject extends DataObject implements MfsAppDataModel {
         return this.getItems() as IterableIterator<MfsAppItem>;
     }
     
-    private *filterAndSelect(value: any, query: MfsQuery): IterableIterator<unknown>{
+    private *filterAndSelect(value: any, query: MfsQuery<MfsAppItem>): IterableIterator<unknown>{
         if (!query.filter || query.filter(value)) {             
-            if (query.select.some(p => !!p)) {                          
+            if (query.select?.some(p => !!p)) {                          
                 yield query.select.reduce((o, k) => { o[k] = value[k]; return o; }, {});
             } else {
                 yield value;    
