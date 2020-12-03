@@ -3,7 +3,7 @@
  * Licensed under the MIT License.
  */
 
-import { INote, IUser, INoteWithVotes } from "./interfaces";
+import { INote, INoteWithVotes, IUser } from "./interfaces";
 
 /**
  * This class is never used to create objects that are stored in Fluid DDSs.
