@@ -4,5 +4,7 @@
  */
 
 export * from "./interfaces";
-export * from "./appModel";
-export * from "./mfsModel";
+export * from "./appPackage/appModel";
+export * from "./appPackage/appDataObject";
+export * from "./mfsPackage/mfsModel";
+export * from "./mfsPackage/mfsDataObject";
