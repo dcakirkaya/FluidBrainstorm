@@ -1,22 +1,20 @@
 /** MFS APP PACKAGE*/
 
 import { AutoNote, FakeUser } from "../demo";
-import { IUser, MfsAppItem } from "..";
+import { IUser, MfsAppItem, MfsItem } from "..";
+import { MfsAppData, MfsAppProperties } from "./appModel";
 
 import { DataObjectFactory } from "@fluidframework/aqueduct";
 import { IFluidHandle } from "@fluidframework/core-interfaces";
 import { MfsDataObject } from "../mfsPackage/mfsDataObject";
 import { SharedMap } from "@fluidframework/map";
-import { v4 as uuidv4 } from 'uuid';
 
 export class MfsAppDataObject extends MfsDataObject {    
     // define app specific DDSes 
-    private usersMap: SharedMap;
-    
+    private usersMap: SharedMap;    
     private userId: string;
     
     protected async initializingFirstTime() {       
-        console.log("app data object initializing");
         super.initializingFirstTime();
         this.createSharedMap("users");
     }
@@ -33,27 +31,27 @@ export class MfsAppDataObject extends MfsDataObject {
      * Creates a "fake" user based on a fake user id and a fake name.
      * Only use this code for protoyping and demos.
      */
-    public addUser = (): void => {
-        // Check for a userId in SessionStorage - this prevents refresh from generating a new user
-        if (sessionStorage.getItem('userId') &&
-            this.usersMap.get<IUser>(sessionStorage.getItem('userId'))) {
-            this.userId = sessionStorage.getItem('userId'); //This session might have has a user
+    addUser = (): void => {
+        // Check for a #userId in SessionStorage - this prevents refresh from generating a new user
+        if (sessionStorage.getItem('#userId') &&
+            this.usersMap.get<IUser>(sessionStorage.getItem('#userId'))) {
+            this.userId = sessionStorage.getItem('#userId'); //This session might have has a user
         } else {
             const user: IUser = {
                 id: FakeUser.getFakeUserId(),
                 name: FakeUser.getFakeName()
             };
             this.userId = user.id;
-            sessionStorage.setItem('userId', user.id);
+            sessionStorage.setItem('#userId', user.id);
             this.usersMap.set(user.id, user);
         }
     }
     
-    public getUser = (): IUser => {
+    getUser = (): IUser => {
         return this.usersMap.get<IUser>(this.userId);
     }
 
-    public getUsers(): IUser[] {
+    getUsers(): IUser[] {
         const users: IUser[] = [];
         this.usersMap.forEach((i: IUser) => {
             users.push(i);
@@ -61,29 +59,53 @@ export class MfsAppDataObject extends MfsDataObject {
         return users;
     }
     
-    public like = (itemId: string) :void => {
-        let mfsItem = this.getItem(itemId);
-        mfsItem.numLikes = mfsItem.numLikes + 1;
+    like = (itemId: string) :void => {
+        // ideally we should use counter dds *with atomic cas - but here we just do compare and set without atomicity
+        const likes = this.getItemProperty(itemId, 'numLikes') as number; // this can totally throw in Runtime. find a better way .== or maybe it's better to let it throw so we can fix it.
+        const itemPatch: Pick<MfsAppItem, 'numLikes'> = { numLikes: likes + 1 };
+        this.patchItem(itemId, itemPatch);
     }
     
-    public createAppItem = (url: string, label: string): void => {
-        const appItem: MfsAppItem = {
-            id: uuidv4(),            
-            url,
-            label,            
-            user: this.getUser(),
-            numLikes: 0            
+    createAppItem = (url: string, label: string): Promise<string> => {
+        const appData: MfsAppData = {                        
+            numLikes: 0,
+            user: this.getUser()
         };
-        this.createItem(appItem);
+        
+        const appItem: Omit<MfsItem, 'id'> = { ...appData, label: label, url: url};
+        return this.createItem(appItem);
     }
     
-    public getItemsFromBoard =  (): IterableIterator<MfsAppItem> => {
+
+    getItemsFromBoard =  (): IterableIterator<MfsAppItem> => {
         return this.getItems() as IterableIterator<MfsAppItem>;
     }
     
-    public createDemoItem = (): string => {
+    createDemoItem = (): string => {
         return AutoNote.createDemoNote()
-    }    
+    }
+    
+    getItem(itemId: string): MfsAppItem | undefined {        
+        const mfsItem = super.getItem(itemId);
+        
+        if (!mfsItem) {
+            return undefined;
+        }
+
+        if (this.isMfsAppItem(mfsItem)) {
+            return mfsItem;
+        }
+    }
+    
+    private isMfsAppItem (item: MfsItem): item is MfsAppItem {        
+        for(const k in MfsAppProperties) {
+            if (!item[k]) {
+                return false;
+            }
+        }
+
+        return true;
+    }
 }
 
 

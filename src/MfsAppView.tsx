@@ -39,12 +39,12 @@ export const MfsAppView: FC<MfsAppViewProps> = (props) => {
   const [state, setState] = useState<MfsAppViewState>(generateState());
   const [highlightMine, setHighlightMine] = useState<boolean>();
 
-  // Setup a listener that
+
   useEffect(() => {
     const onChange = () => setState(generateState());
     props.model.on("change", onChange);
 
-    // useEffect runs after the first render so we will update the view again incase there
+    // useEffect runs only after the first render for this example - so we will update the view again in case there
     // were changes that came into the model in between generating initialState and setting
     // the above event handler
     onChange();

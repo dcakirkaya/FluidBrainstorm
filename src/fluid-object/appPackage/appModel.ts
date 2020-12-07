@@ -1,6 +1,6 @@
 /** MFS APP PACKAGE*/
 
-import { MfsDataModel, MfsItem } from "../mfsPackage/mfsModel";
+import { MfsDataModel, MfsItem, MfsSystemProperty, RequiredKeys } from "../mfsPackage/mfsModel";
 
 export const MfsAppId = "MfsAppId";
 
@@ -9,10 +9,18 @@ export type User = {
     name: string;
 };
 
-export type MfsAppItem = MfsItem & {
+export type MfsAppData = {
     user: User;  
     numLikes: number;    
 };
+
+export type MfsAppItem = MfsItem & MfsAppData;
+
+// TODO: move this to mfs package 
+type MfsAppProperty = RequiredKeys<MfsAppData>;
+
+// should keep a record of all required properties. 
+export const MfsAppProperties: Record<MfsAppProperty| MfsSystemProperty, boolean> =  { id: true, user: true, numLikes: true}; 
 
 export interface MfsAppDataModel  extends MfsDataModel<MfsAppItem> {
     addUser(): void;    
@@ -20,6 +28,6 @@ export interface MfsAppDataModel  extends MfsDataModel<MfsAppItem> {
     getUsers(): User[];    
     like: (itemId: string) => void;
     getItemsFromBoard: () => IterableIterator<MfsAppItem>;
-    createAppItem: (url: string, label?: string) => void;
+    createAppItem: (url: string, label?: string) => Promise<string>;
     createDemoItem: () => string;
 }

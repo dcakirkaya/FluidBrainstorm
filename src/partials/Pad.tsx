@@ -3,7 +3,7 @@
  * Licensed under the MIT License.
  */
 
-import React, { ChangeEvent, FC, useState } from "react";
+import React, { ChangeEvent, FC, useEffect, useState } from "react";
 
 import { Button } from "./Button";
 import { IUser } from "../fluid-object/interfaces";
@@ -13,7 +13,7 @@ import { UserName } from "./UserName";
 // Pad
 interface PadProps {
   demo: () => string;
-  createNote: (text: string) => void;
+  createNote: (text: string) => Promise<string>;
   user: IUser;
   users: IUser[];
   clear: () => void;
@@ -24,13 +24,20 @@ interface PadProps {
 export const Pad: FC<PadProps> = (props) => {
   const [value, setValue] = useState<string>("");
 
-  const createNote = () => {
-    props.createNote(value);
-    setValue("");
+  const createNote = async () => {
+    return props.createNote(value);
+    //setValue("");
   };
+  
+  useEffect(() => {
+    createNote().then(() => setValue(""));
+  }, []);
+
+  
   // const handleHighlight = () => {
   //   props.setHighlightMine(!props.highlightMine);
   // };
+  
 
   const onNoteValueChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
     setValue(e.target.value);
@@ -41,6 +48,8 @@ export const Pad: FC<PadProps> = (props) => {
       setValue(props.demo());
     }
   };
+
+  
 
   return (
     <div className="container">
