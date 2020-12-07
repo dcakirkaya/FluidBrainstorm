@@ -28,6 +28,6 @@ export interface MfsAppDataModel  extends MfsDataModel<MfsAppItem> {
     getUsers(): User[];    
     like: (itemId: string) => void;
     getItemsFromBoard: () => IterableIterator<MfsAppItem>;
-    createAppItem: (url: string, label?: string) => Promise<string>;
+    createAppItem: (url: string, label?: string) => string;
     createDemoItem: () => string;
 }

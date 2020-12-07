@@ -30,10 +30,12 @@ interface MfsAppViewState {
 
 export const MfsAppView: FC<MfsAppViewProps> = (props) => {
   const generateState = () => {
+    const theNotes = [...props.model.getItemsFromBoard()];
+    console.log('View: items', theNotes);
     return {
       user: props.model.getUser(),
       users: props.model.getUsers(),
-      notes: [...props.model.getItemsFromBoard()],
+      notes: theNotes,
     };
   };
   const [state, setState] = useState<MfsAppViewState>(generateState());
@@ -41,13 +43,16 @@ export const MfsAppView: FC<MfsAppViewProps> = (props) => {
 
 
   useEffect(() => {
-    const onChange = () => setState(generateState());
+    const onChange = () => {
+      console.log("View Change: Setting state");
+      setState(generateState());
+    }
     props.model.on("change", onChange);
 
     // useEffect runs only after the first render for this example - so we will update the view again in case there
     // were changes that came into the model in between generating initialState and setting
     // the above event handler
-    onChange();
+    onChange();    
     return () => {
       // When the view dismounts remove the listener to avoid memory leaks
       props.model.off("change", onChange);

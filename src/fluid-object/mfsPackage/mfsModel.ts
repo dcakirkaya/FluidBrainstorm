@@ -27,7 +27,7 @@ export type MfsQuery<T = MfsItem> = {
 }
 
 export interface MfsDataModel<T extends MfsItem> {    
-    createItem(item: Omit<T, 'id'>) : Promise<string>;
+    createItem(item: Omit<T, 'id'>) : string;
     getItem(itemId: string) : T | undefined;
     deleteItem(itemId: string): void; 
     patchItem(itemId: string, item: Partial<Omit<T, 'id'>>): void;

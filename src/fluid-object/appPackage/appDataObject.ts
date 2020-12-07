@@ -66,7 +66,7 @@ export class MfsAppDataObject extends MfsDataObject {
         this.patchItem(itemId, itemPatch);
     }
     
-    createAppItem = (url: string, label: string): Promise<string> => {
+    createAppItem = (url: string, label: string): string => {
         const appData: MfsAppData = {                        
             numLikes: 0,
             user: this.getUser()
