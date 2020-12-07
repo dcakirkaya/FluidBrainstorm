@@ -29,22 +29,29 @@ interface MfsAppViewState {
 }
 
 export const MfsAppView: FC<MfsAppViewProps> = (props) => {
-  const generateState = () => {    
+  const generateState = async () => {        
+    const items = [];
+
+    for await (const v of props.model.getItemsFromBoard()) {
+      items.push(v);
+    }
+    
     return {
       user: props.model.getUser(),
       users: props.model.getUsers(),
-      notes: [...props.model.getItemsFromBoard()],
+      notes: [...items],
     };
   };
-  const [state, setState] = useState<MfsAppViewState>(generateState());
+  const [state, setState] = useState<MfsAppViewState>({ user: props.model.getUser(), users: props.model.getUsers(), notes : []});
   const [highlightMine, setHighlightMine] = useState<boolean>();
 
 
   useEffect(() => {
     const onChange = () => {
-      console.log("View Change: Setting state");
-      setState(generateState());
+      console.log("View Change: Setting state");      
+      generateState().then(s=> setState(s));
     }
+    
     props.model.on("change", onChange);
 
     // useEffect runs only after the first render for this example - so we will update the view again in case there

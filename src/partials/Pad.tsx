@@ -13,7 +13,7 @@ import { UserName } from "./UserName";
 // Pad
 interface PadProps {
   demo: () => string;
-  createNote: (text: string) => string;
+  createNote: (text: string) => Promise<string>;
   user: IUser;
   users: IUser[];
   clear: () => void;
@@ -24,7 +24,7 @@ interface PadProps {
 export const Pad: FC<PadProps> = (props) => {
   const [value, setValue] = useState<string>("");
 
-  const createNote = () => {
+  const createNote = async () => {
     props.createNote(value);
     setValue("");
   };

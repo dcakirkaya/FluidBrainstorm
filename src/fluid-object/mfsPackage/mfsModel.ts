@@ -27,14 +27,14 @@ export type MfsQuery<T = MfsItem> = {
 }
 
 export interface MfsDataModel<T extends MfsItem> {    
-    createItem(item: Omit<T, 'id'>) : string;
-    getItem(itemId: string) : T | undefined;
-    deleteItem(itemId: string): void; 
-    patchItem(itemId: string, item: Partial<Omit<T, 'id'>>): void;
-    putItem(itemId: string, item: Omit<T, 'id'>): void;
-    setItemProperty(itemId: string, propertyKey: string, propertyValue: Serializable): void;  // TODO: prevent setting id.       
-    getItemProperty(itemId: string, propertyKey: string): Serializable | undefined;    
-    getItems(query?: MfsQuery<T>): IterableIterator<Partial<T>>; 
+    createItem(item: Omit<T, 'id'>) : Promise<string>;
+    getItem(itemId: string) : Promise<T | undefined>;
+    deleteItem(itemId: string): Promise<void>; 
+    patchItem(itemId: string, item: Partial<Omit<T, 'id'>>): Promise<void>;
+    putItem(itemId: string, item: Omit<T, 'id'>): Promise<void>;
+    setItemProperty(itemId: string, propertyKey: string, propertyValue: Serializable): Promise<void>;  // TODO: prevent setting id.       
+    getItemProperty(itemId: string, propertyKey: string): Promise<Serializable | undefined>;    
+    getItems(query?: MfsQuery<T>): AsyncIterableIterator<Partial<T>>; 
     on(event: "change", listener: () => void): this;
     off(event: "change", listener: () => void): this;   
 }

@@ -59,14 +59,14 @@ export class MfsAppDataObject extends MfsDataObject {
         return users;
     }
     
-    like = (itemId: string) :void => {
+    like = async (itemId: string) : Promise<void> => {
         // ideally we should use counter dds *with atomic cas - but here we just do compare and set without atomicity
-        const likes = this.getItemProperty(itemId, 'numLikes') as number; // this can totally throw in Runtime. find a better way .== or maybe it's better to let it throw so we can fix it.
+        const likes = await this.getItemProperty(itemId, 'numLikes') as number; // this can totally throw in Runtime. find a better way .== or maybe it's better to let it throw so we can fix it.
         const itemPatch: Pick<MfsAppItem, 'numLikes'> = { numLikes: likes + 1 };
-        this.patchItem(itemId, itemPatch);
+        return this.patchItem(itemId, itemPatch);
     }
     
-    createAppItem = (url: string, label: string): string => {
+    createAppItem = (url: string, label: string): Promise<string> => {
         const appData: MfsAppData = {                        
             numLikes: 0,
             user: this.getUser()
@@ -77,16 +77,16 @@ export class MfsAppDataObject extends MfsDataObject {
     }
     
 
-    getItemsFromBoard =  (): IterableIterator<MfsAppItem> => {
-        return this.getItems() as IterableIterator<MfsAppItem>;
+    getItemsFromBoard =  (): AsyncIterableIterator<MfsAppItem> => {
+        return this.getItems() as AsyncIterableIterator<MfsAppItem>;
     }
     
     createDemoItem = (): string => {
         return AutoNote.createDemoNote()
     }
     
-    getItem(itemId: string): MfsAppItem | undefined {        
-        const mfsItem = super.getItem(itemId);
+    async getItem(itemId: string): Promise<MfsAppItem | undefined> {        
+        const mfsItem = await super.getItem(itemId);
         
         if (!mfsItem) {
             return undefined;
