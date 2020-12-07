@@ -125,8 +125,8 @@ export abstract class MfsDataObject extends DataObject implements MfsDataModel<M
     private createItemInternal(item: Omit<MfsItem, 'id'>, id: string): string {
         console.log('BEGIN_createItem');
         const itemMap = SharedMap.create(this.runtime);
-        this.items.set(id, itemMap.handle);            
-        console.log('isAttached', itemMap.isAttached()); 
+                 
+        console.log('isAttached', itemMap.isAttached()); // False  
         
         for(const propertyKey in item) {
             const value = item[propertyKey];
@@ -137,10 +137,13 @@ export abstract class MfsDataObject extends DataObject implements MfsDataModel<M
             }
         }
 
-        this.createEventListeners(itemMap);             
+        //this.createEventListeners(itemMap);             
         itemMap.set('id', id);
         
+        console.log('isAttached', itemMap.isAttached());    // True-- 
+
         this.itemReferences.set(id, itemMap); 
+        this.items.set(id, itemMap.handle); 
         console.log('END_createItem: itemMap initialized id:', id);
         return id;
     }

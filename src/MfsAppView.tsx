@@ -29,13 +29,11 @@ interface MfsAppViewState {
 }
 
 export const MfsAppView: FC<MfsAppViewProps> = (props) => {
-  const generateState = () => {
-    const theNotes = [...props.model.getItemsFromBoard()];
-    console.log('View: items', theNotes);
+  const generateState = () => {    
     return {
       user: props.model.getUser(),
       users: props.model.getUsers(),
-      notes: theNotes,
+      notes: [...props.model.getItemsFromBoard()],
     };
   };
   const [state, setState] = useState<MfsAppViewState>(generateState());
