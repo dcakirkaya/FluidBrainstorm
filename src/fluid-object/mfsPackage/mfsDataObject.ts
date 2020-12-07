@@ -10,6 +10,7 @@ import { v4 as uuidv4 } from 'uuid';
 export abstract class MfsDataObject extends DataObject implements MfsDataModel<MfsItem> {
     private items: SharedMap;   
     private itemReferences: Map<string, SharedMap> = new Map();
+    private isFirstTimeInitialized: boolean;
     
     createItem = (item: Omit<MfsItem, 'id'>): string => this.createItemInternal(item, uuidv4());
     
@@ -68,16 +69,20 @@ export abstract class MfsDataObject extends DataObject implements MfsDataModel<M
     
     protected async initializingFirstTime() {       
         this.createSharedMap("items");                
-        this.createSharedMap("users");        
+        this.createSharedMap("users");  
+        this.isFirstTimeInitialized = true;      
     }
     
     protected async hasInitialized() {
         this.items = await this.root.get<IFluidHandle<SharedMap>>("items").get();        
         this.createEventListeners(this.items);   
         
-        const loadedItemMaps = await this.lazyLoadItems(this.items);
-        loadedItemMaps.forEach((v, k) => this.itemReferences.set(v.get('id'), v));        
-        console.log('Has initialized:', this.itemReferences);
+        if (!this.isFirstTimeInitialized) {
+            //TODO: pass the keys of the items to load.                     
+            const loadedItemMaps = await this.lazyLoadItems(this.items);
+            loadedItemMaps.forEach((v, k) => this.itemReferences.set(v.get('id'), v));        
+            console.log('Loaded ITEM REFS:', this.itemReferences);                
+        }
         
         const quorum = this.context.getQuorum();
         quorum.on("addMember", () => {
@@ -89,7 +94,7 @@ export abstract class MfsDataObject extends DataObject implements MfsDataModel<M
         });     
     }
 
-    protected async lazyLoadItems(items: SharedMap) : Promise<SharedMap[]> {
+    protected async lazyLoadItems(items: SharedMap, _itemKeys?:string[]) : Promise<SharedMap[]> {
         const loadItemTasks: Promise<SharedMap>[] = [];
         
         for(const key of items.keys()) {            
