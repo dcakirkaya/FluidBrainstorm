@@ -21,12 +21,13 @@ export type MfsRelationship<R> = {
 }
 
 export type MfsQuery<T = MfsItem> = {    
-    filter?: (item: T) => boolean | string; 
+    filter?: (item: ItemMap) => boolean; 
     select?: string[];
-    expand?: string[]; 
+    //expand?: string[]; 
 }
+export type ItemMap = Map<string, Serializable>;
 
-export interface MfsDataModel<T extends MfsItem> {    
+export interface MfsDataModel<T extends MfsItem> {       
     createItem(item: Omit<T, 'id'>) : Promise<string>;
     getItem(itemId: string) : Promise<T | undefined>;
     deleteItem(itemId: string): Promise<void>; 

@@ -1,4 +1,4 @@
-import { MfsDataModel, MfsItem } from "./mfsModel";
+import { ItemMap, MfsDataModel, MfsItem } from "./mfsModel";
 
 import { DataObject } from "@fluidframework/aqueduct";
 import { IFluidHandle } from "@fluidframework/core-interfaces";
@@ -62,13 +62,11 @@ export abstract class MfsDataObject extends DataObject implements MfsDataModel<M
     async *getItems(query?: MfsQuery<MfsItem>): AsyncIterableIterator <Partial<MfsItem>> {   
         
         for(const [_, itemMapHandle] of this.items) {
-            // if (!query) {
-            //     if (!query.filter || query.filter())   
-            // }
-            // else {
-                const itemMap = await (itemMapHandle as  IFluidHandle<SharedMap>).get();
+            const itemMap = await (itemMapHandle as  IFluidHandle<SharedMap>).get();
+            
+            if (!query?.filter || query.filter(itemMap)) {
                 yield this.toItem(itemMap, query?.select);    
-            // }            
+            }            
         }
     }
     
@@ -161,10 +159,10 @@ export abstract class MfsDataObject extends DataObject implements MfsDataModel<M
         return itemMap;
     }
 
-    protected toItem(itemMap: Map<string, Serializable>, selectedKeys? : string[]) : MfsItem {        
+    protected toItem(itemMap: ItemMap, selectedKeys? : string[]) : MfsItem {        
         const mfsItem: Partial<MfsItem> = {};
         
-        for(const [key, value] of itemMap) {
+        for(const [key, value] of itemMap) {            
             if (!selectedKeys || selectedKeys.includes(key)) {
                 mfsItem[key] = value;     
             }             

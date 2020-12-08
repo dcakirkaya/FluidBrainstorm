@@ -25,31 +25,38 @@ interface MfsAppViewProps {
 interface MfsAppViewState {
   user: IUser;
   users: IUser[];
-  notes: MfsAppItem[];
 }
 
 export const MfsAppView: FC<MfsAppViewProps> = (props) => {
-  const generateState = async () => {        
+  const generateState = () => {        
+    return {
+      user: props.model.getUser(),
+      users: props.model.getUsers(),     
+    };
+  };
+
+  const [state, setState] = useState<MfsAppViewState>({ user: props.model.getUser(), users: props.model.getUsers()});
+
+  const readItems = async (filter?:string) => {        
     const items = [];
 
-    for await (const v of props.model.getItemsFromBoard()) {
+    for await (const v of props.model.getItemsFromBoard(filter)) {
       items.push(v);
     }
     
-    return {
-      user: props.model.getUser(),
-      users: props.model.getUsers(),
-      notes: [...items],
-    };
+    return items;
   };
-  const [state, setState] = useState<MfsAppViewState>({ user: props.model.getUser(), users: props.model.getUsers(), notes : []});
+  
+  const [items, setItems] = useState<MfsAppItem[]>([]);
   const [highlightMine, setHighlightMine] = useState<boolean>();
 
 
   useEffect(() => {
     const onChange = () => {
-      console.log("View Change: Setting state");      
-      generateState().then(s=> setState(s));
+      setState(generateState());
+      readItems().then(s=> {        
+        setItems(s)
+      });
     }
     
     props.model.on("change", onChange);
@@ -68,6 +75,9 @@ export const MfsAppView: FC<MfsAppViewProps> = (props) => {
     <div>
       <Pad
         createNote={props.model.createAppItem}
+        filterItems ={async (text) => {
+          readItems(text).then((s) => setItems(s));
+        }}
         demo={props.model.createDemoItem}
         user={state.user}
         users={state.users}
@@ -76,7 +86,7 @@ export const MfsAppView: FC<MfsAppViewProps> = (props) => {
         highlightMine={highlightMine}
       />
       <Board
-        notes={state.notes}
+        notes={items}
         like={props.model.like}
         user={state.user}
         highlightMine={highlightMine}

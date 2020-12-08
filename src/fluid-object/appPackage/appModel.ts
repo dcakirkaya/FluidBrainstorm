@@ -11,7 +11,7 @@ export type User = {
 
 export type MfsAppData = {
     user: User;  
-    numLikes: number;    
+    numLikes: number;       
 };
 
 export type MfsAppItem = MfsItem & MfsAppData;
@@ -27,7 +27,7 @@ export interface MfsAppDataModel  extends MfsDataModel<MfsAppItem> {
     getUser(): User | undefined;
     getUsers(): User[];    
     like: (itemId: string) => Promise<void>;
-    getItemsFromBoard: () => AsyncIterableIterator<MfsAppItem>;
+    getItemsFromBoard: (filterString?: string) => AsyncIterableIterator<MfsAppItem>;
     createAppItem: (url: string, label?: string) => Promise<string>;
     createDemoItem: () => string;
 }

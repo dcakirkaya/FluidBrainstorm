@@ -14,6 +14,7 @@ import { UserName } from "./UserName";
 interface PadProps {
   demo: () => string;
   createNote: (text: string) => Promise<string>;
+  filterItems: (text: string) => Promise<void>;
   user: IUser;
   users: IUser[];
   clear: () => void;
@@ -51,6 +52,7 @@ export const Pad: FC<PadProps> = (props) => {
           onChange={onNoteValueChange}
           onEnter={createNote}
         />
+        <input type="text" onChange={(t) => props.filterItems(t.target.value)} />
         <Button onClick={createNote}> Create Mfs Item </Button>
         {/* <Button onClick={handleHighlight}>
           {props.highlightMine ? "Stop highlighting" : "Highlight my ideas"}

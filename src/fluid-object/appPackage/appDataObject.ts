@@ -1,7 +1,7 @@
 /** MFS APP PACKAGE*/
 
 import { AutoNote, FakeUser } from "../demo";
-import { IUser, MfsAppItem, MfsItem } from "..";
+import { IUser, MfsAppItem, MfsItem, MfsQuery } from "..";
 import { MfsAppData, MfsAppProperties } from "./appModel";
 
 import { DataObjectFactory } from "@fluidframework/aqueduct";
@@ -77,8 +77,18 @@ export class MfsAppDataObject extends MfsDataObject {
     }
     
 
-    getItemsFromBoard =  (): AsyncIterableIterator<MfsAppItem> => {
-        return this.getItems() as AsyncIterableIterator<MfsAppItem>;
+    getItemsFromBoard =  (filter?: string): AsyncIterableIterator<MfsAppItem> => {
+        
+        const query: MfsQuery | undefined = !!filter ? {
+            filter : (itemMap) => { 
+                const url = (itemMap.get('url') as string).toLowerCase();
+                return url.includes(filter.toLowerCase());
+            }
+
+        } : undefined;
+
+        
+        return this.getItems(query) as AsyncIterableIterator<MfsAppItem>;
     }
     
     createDemoItem = (): string => {
