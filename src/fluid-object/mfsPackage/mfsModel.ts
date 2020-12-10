@@ -8,23 +8,16 @@ export type MfsItem = {
 
 export type MfsSystemProperty = 'id'; // add more 
 
-//  if there are any common relationship types for all items - available to all apps, we can add them here.
-type MfsCommonRelationshipType = 'parent' | 'child' | 'onDate'; 
-export type MfsRelationshipType<R> = R extends MfsCommonRelationshipType ? MfsCommonRelationshipType : R extends string ? R : never;
-
+/**
+ * All the required keys of type T. Used by the SDK to implement type-guard on read 
+ */
 export type RequiredKeys<T> = { [K in keyof T]-?: {} extends Pick<T, K> ? never : K }[keyof T];
 
-export type MfsRelationship<R> = {    
-    inId: string;
-    outId: string;    
-    type: MfsRelationshipType<R>;    
-}
-
-export type MfsQuery<T = MfsItem> = {    
+export type MfsQuery = {    
     filter?: (item: ItemMap) => boolean; 
     select?: string[];
-    //expand?: string[]; 
 }
+
 export type ItemMap = Map<string, Serializable>;
 
 export interface MfsDataModel<T extends MfsItem> {       
@@ -35,7 +28,7 @@ export interface MfsDataModel<T extends MfsItem> {
     putItem(itemId: string, item: Omit<T, 'id'>): Promise<void>;
     setItemProperty(itemId: string, propertyKey: string, propertyValue: Serializable): Promise<void>;  // TODO: prevent setting id.       
     getItemProperty(itemId: string, propertyKey: string): Promise<Serializable | undefined>;    
-    getItems(query?: MfsQuery<T>): AsyncIterableIterator<Partial<T>>; 
+    getItems(query?: MfsQuery): AsyncIterableIterator<Partial<T>>; 
     on(event: "change", listener: () => void): this;
     off(event: "change", listener: () => void): this;   
 }

@@ -27,6 +27,7 @@
     "@fluidframework/view-interfaces": "^0.26.0",
     "react": "^16.8.3",
     "react-dom": "^16.8.3",
+    "react-icons": "^4.1.0",
     "uuid": "^8.0.0"
   },
   "devDependencies": {

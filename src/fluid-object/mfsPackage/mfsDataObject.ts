@@ -59,7 +59,7 @@ export abstract class MfsDataObject extends DataObject implements MfsDataModel<M
         return itemMap.get(propertyKey);
     }    
     
-    async *getItems(query?: MfsQuery<MfsItem>): AsyncIterableIterator <Partial<MfsItem>> {   
+    async *getItems(query?: MfsQuery): AsyncIterableIterator <Partial<MfsItem>> {   
         
         for(const [_, itemMapHandle] of this.items) {
             const itemMap = await (itemMapHandle as  IFluidHandle<SharedMap>).get();

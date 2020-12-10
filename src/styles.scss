@@ -25,7 +25,12 @@ body {
     user-select: none;
     padding: .2em;
     transition: transform .2s ease-out;           
-  } 
+  }
+  
+  .filter-input {
+    margin: .5em;
+    border-radius:  0.2em;
+  }
 
   .note:nth-child(even) {
     transform:rotate(3deg);    
