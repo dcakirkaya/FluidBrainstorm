@@ -30,4 +30,5 @@ export interface MfsAppDataModel  extends MfsDataModel<MfsAppItem> {
     getItemsFromBoard: (filterString?: string) => AsyncIterableIterator<MfsAppItem>;
     createAppItem: (url: string, label?: string) => Promise<string>;
     createDemoItem: () => string;
+    clear: () => void;
 }

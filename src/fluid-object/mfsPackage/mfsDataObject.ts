@@ -8,6 +8,7 @@ import { SharedMap } from "@fluidframework/map";
 import { v4 as uuidv4 } from 'uuid';
 
 export abstract class MfsDataObject extends DataObject implements MfsDataModel<MfsItem> {
+    
     private items: SharedMap;           
     
     createItem = (item: Omit<MfsItem, 'id'>): Promise<string> => this.createItemInternal(item, uuidv4());
@@ -21,6 +22,10 @@ export abstract class MfsDataObject extends DataObject implements MfsDataModel<M
         const map = await this.getItemMap(itemId);
         map.removeAllListeners();        
         this.items.delete(itemId);        
+    }
+
+    deleteItems(): void {
+        this.items.clear();        
     }
     
     // update only provided properties, keep the rest intact
@@ -65,6 +70,11 @@ export abstract class MfsDataObject extends DataObject implements MfsDataModel<M
             const itemMap = await (itemMapHandle as  IFluidHandle<SharedMap>).get();
             
             if (!query?.filter || query.filter(itemMap)) {
+                if (itemMap['_eventsCount'] === 1) {
+                    this.createEventListeners(itemMap);
+                    console.log('Added event to ', itemMap.get('id'));                    
+                } 
+                                
                 yield this.toItem(itemMap, query?.select);    
             }            
         }
@@ -77,15 +87,7 @@ export abstract class MfsDataObject extends DataObject implements MfsDataModel<M
     
     protected async hasInitialized() {
         this.items = await this.root.get<IFluidHandle<SharedMap>>("items").get();        
-        this.createEventListeners(this.items);   
-        
-        // if (!this.isFirstTimeInitialized) {
-        //     //TODO: pass the keys of the items to load.                     
-        //     const loadedItemMaps = await this.lazyLoadItems(this.items);
-        //     loadedItemMaps.forEach((v, k) => this.itemReferences.set(v.get('id'), v));        
-        //     console.log('Loaded ITEM REFS:', this.itemReferences);                
-        // }
-        
+        this.createEventListeners(this.items);           
         const quorum = this.context.getQuorum();
         quorum.on("addMember", () => {
             this.emit("change");
@@ -117,14 +119,16 @@ export abstract class MfsDataObject extends DataObject implements MfsDataModel<M
 
     protected createEventListeners(sharedMap: SharedMap): void {
         // Set up an event listener for changes to values in the SharedMap
+        console.log('CREATED EVENT LISTENER FOR ', sharedMap.get('id'))
+                
         sharedMap.on("valueChanged", (...args) => {
             console.log("on valueChanged", args);
             this.emit("change");
         });
-
-        //Set up an event listener for clearing the data in a SharedMap
-        sharedMap.on("clear", () => {
-            console.log("on clear");
+        
+        //Set up an event listener for clearing the data in a SharedMap        
+        sharedMap.on("clear", (...args) => {
+            console.log("on clear", args);
             this.emit("change");
         });
     }
@@ -141,9 +145,9 @@ export abstract class MfsDataObject extends DataObject implements MfsDataModel<M
                 itemMap.set(propertyKey, value);                 
             }
         }
-
-        //this.createEventListeners(itemMap);             
+                    
         itemMap.set('id', id);
+        this.createEventListeners(itemMap); 
         this.items.set(id, itemMap.handle); 
         console.log('END_createItem: itemMap initialized id:', id);
         return id;

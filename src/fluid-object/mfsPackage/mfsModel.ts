@@ -23,7 +23,8 @@ export type ItemMap = Map<string, Serializable>;
 export interface MfsDataModel<T extends MfsItem> {       
     createItem(item: Omit<T, 'id'>) : Promise<string>;
     getItem(itemId: string) : Promise<T | undefined>;
-    deleteItem(itemId: string): Promise<void>; 
+    deleteItem(itemId: string): Promise<void>;
+    deleteItems() : void; 
     patchItem(itemId: string, item: Partial<Omit<T, 'id'>>): Promise<void>;
     putItem(itemId: string, item: Omit<T, 'id'>): Promise<void>;
     setItemProperty(itemId: string, propertyKey: string, propertyValue: Serializable): Promise<void>;  // TODO: prevent setting id.       

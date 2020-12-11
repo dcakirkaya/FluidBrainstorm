@@ -81,7 +81,7 @@ export const MfsAppView: FC<MfsAppViewProps> = (props) => {
         demo={props.model.createDemoItem}
         user={state.user}
         users={state.users}
-        clear={() => alert("clear not implemented")}
+        clear={props.model.clear}
         setHighlightMine={setHighlightMine}
         highlightMine={highlightMine}
       />

@@ -2,14 +2,14 @@
 
 import { AutoNote, FakeUser } from "../demo";
 import { IUser, MfsAppItem, MfsItem, MfsQuery } from "..";
-import { MfsAppData, MfsAppProperties } from "./appModel";
+import { MfsAppData, MfsAppDataModel, MfsAppProperties } from "./appModel";
 
 import { DataObjectFactory } from "@fluidframework/aqueduct";
 import { IFluidHandle } from "@fluidframework/core-interfaces";
 import { MfsDataObject } from "../mfsPackage/mfsDataObject";
 import { SharedMap } from "@fluidframework/map";
 
-export class MfsAppDataObject extends MfsDataObject {    
+export class MfsAppDataObject extends MfsDataObject implements MfsAppDataModel {
     // define app specific DDSes 
     private usersMap: SharedMap;    
     private userId: string;
@@ -94,6 +94,10 @@ export class MfsAppDataObject extends MfsDataObject {
     createDemoItem = (): string => {
         return AutoNote.createDemoNote()
     }
+
+    clear = (): void => {
+        this.deleteItems();
+    }    
     
     async getItem(itemId: string): Promise<MfsAppItem | undefined> {        
         const mfsItem = await super.getItem(itemId);
