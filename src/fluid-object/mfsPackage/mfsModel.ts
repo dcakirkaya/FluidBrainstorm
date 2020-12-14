@@ -1,9 +1,9 @@
-import { Serializable } from "./serializable";
+import { MfsValue } from "./mfsValue";
 
 // SharedMap requires its keys to be strings and values to be serializable - non-serializable keys or values can't be transmitted to other clients.
 export type MfsItem = {
-    readonly id: string;       
-    [propertyName:string] : Serializable;
+    readonly id: string;        
+    [propertyName:string] : MfsValue;    
 }
 
 export type MfsSystemProperty = 'id'; // add more 
@@ -18,7 +18,8 @@ export type MfsQuery = {
     select?: string[];
 }
 
-export type ItemMap = Map<string, Serializable>;
+
+export type ItemMap = Map<string, MfsValue>;
 
 export interface MfsDataModel<T extends MfsItem> {       
     createItem(item: Omit<T, 'id'>) : Promise<string>;
@@ -27,9 +28,10 @@ export interface MfsDataModel<T extends MfsItem> {
     deleteItems() : void; 
     patchItem(itemId: string, item: Partial<Omit<T, 'id'>>): Promise<void>;
     putItem(itemId: string, item: Omit<T, 'id'>): Promise<void>;
-    setItemProperty(itemId: string, propertyKey: string, propertyValue: Serializable): Promise<void>;  // TODO: prevent setting id.       
-    getItemProperty(itemId: string, propertyKey: string): Promise<Serializable | undefined>;    
-    getItems(query?: MfsQuery): AsyncIterableIterator<Partial<T>>; 
+    setItemProperty(itemId: string, propertyKey: string, propertyValue: MfsValue): Promise<void>;  // TODO: prevent setting id.       
+    getItemProperty(itemId: string, propertyKey: string): Promise<MfsValue | undefined>;
+    deleteItemProperty(itemId: string, propertyKey: string): Promise<void>;    
+    getItems(query?: MfsQuery): AsyncIterableIterator<Partial<T>>;         
     on(event: "change", listener: () => void): this;
     off(event: "change", listener: () => void): this;   
 }

@@ -3,12 +3,11 @@ import { ItemMap, MfsDataModel, MfsItem } from "./mfsModel";
 import { DataObject } from "@fluidframework/aqueduct";
 import { IFluidHandle } from "@fluidframework/core-interfaces";
 import { MfsQuery } from "..";
-import { Serializable } from "./serializable";
+import { MfsValue } from "./mfsValue";
 import { SharedMap } from "@fluidframework/map";
 import { v4 as uuidv4 } from 'uuid';
 
-export abstract class MfsDataObject extends DataObject implements MfsDataModel<MfsItem> {
-    
+export abstract class MfsDataObject extends DataObject implements MfsDataModel<MfsItem> {    
     private items: SharedMap;           
     
     createItem = (item: Omit<MfsItem, 'id'>): Promise<string> => this.createItemInternal(item, uuidv4());
@@ -50,7 +49,7 @@ export abstract class MfsDataObject extends DataObject implements MfsDataModel<M
         return this.createItemInternal(item, itemId).then((_) => {});
     }
     
-    async setItemProperty(itemId: string, propertyKey: string, propertyValue: Serializable): Promise<void> {
+    async setItemProperty(itemId: string, propertyKey: string, propertyValue: MfsValue): Promise<void> {
         // should preserve the type of the property.
         if (propertyKey === 'id')  {
             throw new Error('System property id cannot be set');
@@ -59,7 +58,11 @@ export abstract class MfsDataObject extends DataObject implements MfsDataModel<M
         itemMap.set(propertyKey, propertyValue);
     }  
     
-    async getItemProperty(itemId: string, propertyKey: string): Promise<Serializable | undefined> {
+    deleteItemProperty(itemId: string, propertyKey: string): Promise<void> {
+        throw new Error("Method not implemented.");
+    }
+
+    async getItemProperty(itemId: string, propertyKey: string): Promise<MfsValue | undefined> {
         const itemMap = await this.getItemMap(itemId);
         return itemMap.get(propertyKey);
     }    
