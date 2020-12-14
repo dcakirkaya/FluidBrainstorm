@@ -10,6 +10,7 @@ import { MfsDataObject } from "../mfsPackage/mfsDataObject";
 import { SharedMap } from "@fluidframework/map";
 
 export class MfsAppDataObject extends MfsDataObject implements MfsAppDataModel {
+    
     // define app specific DDSes 
     private usersMap: SharedMap;    
     private userId: string;

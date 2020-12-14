@@ -1,3 +1,4 @@
+import { MfsRelationship } from "./mfsRelationship";
 import { MfsValue } from "./mfsValue";
 
 // SharedMap requires its keys to be strings and values to be serializable - non-serializable keys or values can't be transmitted to other clients.
@@ -28,10 +29,11 @@ export interface MfsDataModel<T extends MfsItem> {
     deleteItems() : void; 
     patchItem(itemId: string, item: Partial<Omit<T, 'id'>>): Promise<void>;
     putItem(itemId: string, item: Omit<T, 'id'>): Promise<void>;
-    setItemProperty(itemId: string, propertyKey: string, propertyValue: MfsValue): Promise<void>;  // TODO: prevent setting id.       
+    setItemProperty(itemId: string, propertyKey: string, propertyValue: MfsValue): Promise<void>;       
     getItemProperty(itemId: string, propertyKey: string): Promise<MfsValue | undefined>;
     deleteItemProperty(itemId: string, propertyKey: string): Promise<void>;    
-    getItems(query?: MfsQuery): AsyncIterableIterator<Partial<T>>;         
+    getItems(query?: MfsQuery): AsyncIterableIterator<Partial<T>>;
+    createRelationship(relationship: MfsRelationship): Promise<void>;         
     on(event: "change", listener: () => void): this;
     off(event: "change", listener: () => void): this;   
 }

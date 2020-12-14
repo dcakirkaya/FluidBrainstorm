@@ -3,11 +3,13 @@ import { ItemMap, MfsDataModel, MfsItem } from "./mfsModel";
 import { DataObject } from "@fluidframework/aqueduct";
 import { IFluidHandle } from "@fluidframework/core-interfaces";
 import { MfsQuery } from "..";
+import { MfsRelationship } from "./mfsRelationship";
 import { MfsValue } from "./mfsValue";
 import { SharedMap } from "@fluidframework/map";
 import { v4 as uuidv4 } from 'uuid';
 
-export abstract class MfsDataObject extends DataObject implements MfsDataModel<MfsItem> {    
+export abstract class MfsDataObject extends DataObject implements MfsDataModel<MfsItem> {
+        
     private items: SharedMap;           
     
     createItem = (item: Omit<MfsItem, 'id'>): Promise<string> => this.createItemInternal(item, uuidv4());
@@ -58,8 +60,9 @@ export abstract class MfsDataObject extends DataObject implements MfsDataModel<M
         itemMap.set(propertyKey, propertyValue);
     }  
     
-    deleteItemProperty(itemId: string, propertyKey: string): Promise<void> {
-        throw new Error("Method not implemented.");
+    async deleteItemProperty(itemId: string, propertyKey: string): Promise<void> {
+        const itemMap = await this.getItemMap(itemId);
+        itemMap.delete(propertyKey);
     }
 
     async getItemProperty(itemId: string, propertyKey: string): Promise<MfsValue | undefined> {
@@ -81,6 +84,10 @@ export abstract class MfsDataObject extends DataObject implements MfsDataModel<M
                 yield this.toItem(itemMap, query?.select);    
             }            
         }
+    }
+
+    createRelationship(relationship: MfsRelationship<"contains">): Promise<void> {
+        throw new Error("Method not implemented.");
     }
     
     protected async initializingFirstTime() {       

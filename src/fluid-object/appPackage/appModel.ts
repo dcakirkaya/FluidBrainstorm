@@ -1,6 +1,6 @@
 /** MFS APP PACKAGE*/
 
-import { MfsDataModel, MfsItem, MfsSystemProperty, RequiredKeys } from "../mfsPackage/mfsModel";
+import { MfsItem, MfsSystemProperty, RequiredKeys } from "../mfsPackage/mfsModel";
 
 export const MfsAppId = "MfsAppId";
 
@@ -22,7 +22,7 @@ type MfsAppProperty = RequiredKeys<MfsAppData>;
 // should keep a record of all required properties. 
 export const MfsAppProperties: Record<MfsAppProperty| MfsSystemProperty, boolean> =  { id: true, user: true, numLikes: true}; 
 
-export interface MfsAppDataModel  extends MfsDataModel<MfsAppItem> {
+export interface MfsAppDataModel {
     addUser(): void;    
     getUser(): User | undefined;
     getUsers(): User[];    
@@ -31,4 +31,6 @@ export interface MfsAppDataModel  extends MfsDataModel<MfsAppItem> {
     createAppItem: (url: string, label?: string) => Promise<string>;
     createDemoItem: () => string;
     clear: () => void;
+    on(event: "change", listener: () => void): this;
+    off(event: "change", listener: () => void): this;
 }
